@@ -1,5 +1,7 @@
 package boardgame;
 
+import chess.CheesException;
+
 public class Board {
 
 	private int rows;
@@ -44,6 +46,21 @@ public class Board {
 		}
 		pieces[postition.getRow()][postition.getColumn()] = piece;
 		piece.position = postition;
+	}
+	
+	public Piece removePiece(Position position) {
+		if(!positionExists(position)) {
+			throw new CheesException("position not on the borad");
+		}
+		
+		if(piece(position) == null) {
+			return null;
+		}
+		
+		Piece aux = piece(position);
+		aux.position = null;
+		pieces[position.getRow()][position.getColumn()] = null;
+		return aux;
 	}
 	
 	private boolean positionExists(int row, int column) {
