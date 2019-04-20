@@ -1,7 +1,6 @@
 package chess;
 
 import boardgame.Board;
-import boardgame.BoardException;
 import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
@@ -34,8 +33,15 @@ public class ChessMatch  {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
+		validadeTargetPosition(source, target);
 		Piece capturedPiece = makeMove(source, target);
 		return (ChessPiece)capturedPiece;
+	}
+	
+	private void validadeTargetPosition(Position source, Position target) {
+		if(!board.piece(source).possibleMove(target)) {
+			throw new CheesException("the chosen piece can't move to target position");
+		}
 	}
 	
 	private Piece makeMove(Position source, Position target) {
@@ -47,11 +53,11 @@ public class ChessMatch  {
 	
 	private void validateSourcePosition(Position position) {
 		if(!board.thereIsAPiece(position)) {
-			throw new CheesException("There is no piece on source position");
+			throw new CheesException("Not there is no piece on source position");
 		}
 		
 		if(!board.piece(position).isThereAnyPossibleMove()) {
-			throw new CheesException("There is possible move for the chosen piece");
+			throw new CheesException("Not there is possible move for the chosen piece");
 		}
 	}
 	
