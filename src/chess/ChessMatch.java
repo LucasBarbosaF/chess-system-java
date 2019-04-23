@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
@@ -9,10 +12,25 @@ import chess.pieces.Rook;
 public class ChessMatch  {
 
 	private Board board;
+	private int turn;
+	private Color currentPlay;
+	
+	private List<Piece> piecesOnTheBoard = new ArrayList<>();
+	private List<Piece> capturdPieces = new ArrayList<>();
 	
 	public ChessMatch() {
 		board = new Board(8, 8);
+		turn = 1;
+		currentPlay = Color.WHITE;
 		initialSetup();
+	}
+	
+	public int getTurn() {
+		return this.turn;
+	}
+	
+	public Color getCurrentPlay() {
+		return this.currentPlay;
 	}
 	
 	public ChessPiece[][] getPieces() {
@@ -27,6 +45,7 @@ public class ChessMatch  {
 	
 	private void placeNewPiece(char column, int row, ChessPiece chessPiece) {
 		board.placePiece(chessPiece, new ChessPosition(column, row).toPosition());
+		piecesOnTheBoard.add(chessPiece);
 	}
 	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
@@ -35,6 +54,7 @@ public class ChessMatch  {
 		validateSourcePosition(source);
 		validadeTargetPosition(source, target);
 		Piece capturedPiece = makeMove(source, target);
+		nextTurn();
 		return (ChessPiece)capturedPiece;
 	}
 	
@@ -54,6 +74,10 @@ public class ChessMatch  {
 		Piece p = board.removePiece(source);
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
+		if(capturedPiece != null) {
+			piecesOnTheBoard.remove(capturedPiece);
+			capturdPieces.add(capturedPiece);	
+		}
 		return capturedPiece;
 	}
 	
@@ -62,9 +86,18 @@ public class ChessMatch  {
 			throw new CheesException("Not there is no piece on source position");
 		}
 		
+		if(currentPlay != ((ChessPiece)board.piece(position)).getColor()) {
+			throw new CheesException("The chosen piece is not yours");
+		}
+		
 		if(!board.piece(position).isThereAnyPossibleMove()) {
 			throw new CheesException("Not there is possible move for the chosen piece");
 		}
+	}
+	
+	private void nextTurn() {
+		turn++;
+		currentPlay = (currentPlay == Color.WHITE) ? Color.BLACK : Color.WHITE;
 	}
 	
 	public void initialSetup() {
